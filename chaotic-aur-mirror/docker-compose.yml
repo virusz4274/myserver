@@ -1,0 +1,76 @@
+version: '3.1'
+services:
+  syncthing:
+    image: 'ghcr.io/linuxserver/syncthing:latest'
+    container_name: syncthing
+    hostname: chaotic-mirror-virusz4274
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - ./syncthing:/config
+      - ./srv/http/repos/chaotic-aur:/chaotic
+    ports:
+      - 8384:8384
+      - 22000:22000
+      - 21027:21027/udp
+    restart: always
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.2
+
+  npm_app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm_app
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "npm_db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - npm_db
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.3
+
+  npm_db:
+    image: jc21/mariadb-aria:10.4
+    container_name: npm_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'npm'
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: 'npm'
+    volumes:
+      - ./npm/data/mysql:/var/lib/mysql
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.4
+
+  nginx_builds:
+    image: dceoy/nginx-autoindex:latest
+    container_name: nginx_chaotic
+    restart: always
+    volumes:
+      - './srv/http/repos:/var/lib/nginx/html/repos:ro'
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.5
+
+networks:
+  front_npm:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/24
