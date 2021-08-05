@@ -7,7 +7,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/Berlin
+      - TZ=Asia/Kolkata
     volumes:
       - ./syncthing:/config
       - ./srv/http/repos/chaotic-aur:/chaotic
