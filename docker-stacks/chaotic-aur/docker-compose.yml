@@ -17,7 +17,7 @@ services:
       - 21027:21027/udp
     restart: always
     networks:
-      front_npm:
+      chaotic:
         ipv4_address: 10.5.0.2
 
   nginx_builds:
@@ -27,11 +27,11 @@ services:
     volumes:
       - './srv/http/repos:/var/lib/nginx/html/repos:ro'
     networks:
-      front_npm:
+      chaotic:
         ipv4_address: 10.5.0.3
 
 networks:
-  front_npm:
+  chaotic:
     driver: bridge
     ipam:
      config:
