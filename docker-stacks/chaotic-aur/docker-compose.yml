@@ -1,0 +1,38 @@
+version: '3.1'
+services:
+  syncthing:
+    image: ghcr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: chaotic-mirror-virusz4274
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./syncthing:/config
+      - ./srv/http/repos/chaotic-aur:/chaotic
+    ports:
+      - 8384:8384
+      - 22000:22000
+      - 21027:21027/udp
+    restart: always
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.2
+
+  nginx_builds:
+    image: dceoy/nginx-autoindex:latest
+    container_name: nginx_chaotic
+    restart: always
+    volumes:
+      - './srv/http/repos:/var/lib/nginx/html/repos:ro'
+    networks:
+      front_npm:
+        ipv4_address: 10.5.0.3
+
+networks:
+  front_npm:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/24
