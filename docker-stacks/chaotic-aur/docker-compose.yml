@@ -1,5 +1,16 @@
 version: '3.1'
 services:
+
+  nginx_builds:
+    image: dceoy/nginx-autoindex:latest
+    container_name: nginx_chaotic
+    restart: always
+    volumes:
+      - './srv/http/repos:/var/lib/nginx/html/repos:ro'
+    networks:
+      chaotic:
+        ipv4_address: 10.5.0.2
+               
   syncthing:
     image: ghcr.io/linuxserver/syncthing:latest
     container_name: syncthing
@@ -16,16 +27,6 @@ services:
       - 22000:22000
       - 21027:21027/udp
     restart: always
-    networks:
-      chaotic:
-        ipv4_address: 10.5.0.2
-
-  nginx_builds:
-    image: dceoy/nginx-autoindex:latest
-    container_name: nginx_chaotic
-    restart: always
-    volumes:
-      - './srv/http/repos:/var/lib/nginx/html/repos:ro'
     networks:
       chaotic:
         ipv4_address: 10.5.0.3
