@@ -10,7 +10,7 @@ services:
       - '81:81'
       - '443:443'
     environment:
-      DB_MYSQL_HOST: 172.17.0.3
+      DB_MYSQL_HOST: 10.5.0.3
       DB_MYSQL_PORT: 3306
       DB_MYSQL_USER: "npm"
       DB_MYSQL_PASSWORD: "npm"
@@ -20,7 +20,9 @@ services:
       - ./npm/letsencrypt:/etc/letsencrypt
     depends_on:
       - npm_db
-    network_mode: bridge
+    networks:
+      npm:
+        ipv4_address: 10.5.0.2
 
   npm_db:
     image: jc21/mariadb-aria:latest
@@ -33,4 +35,13 @@ services:
       MYSQL_PASSWORD: 'npm'
     volumes:
       - ./npm/data/mysql:/var/lib/mysql
-    network_mode: bridge
+    networks:
+      npm:
+        ipv4_address: 10.5.0.3
+
+networks:
+  npm: 
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/24
