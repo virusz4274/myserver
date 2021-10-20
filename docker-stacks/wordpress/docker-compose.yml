@@ -11,7 +11,10 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    
+    networks:
+      network:
+        ipv4_address: 10.7.0.2
+        
   wordpress:
     depends_on:
       - db
@@ -19,11 +22,19 @@ services:
     volumes:
       - ./wordpress_data:/var/www/html
       - ./custom.ini:/usr/local/etc/php/conf.d/custom.ini
-    ports:
-      - "7080:80"
     restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
+    networks:
+      network:
+        ipv4_address: 10.7.0.3
+      
+networks:
+  network:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.7.0.0/24
